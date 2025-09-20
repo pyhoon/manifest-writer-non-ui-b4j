@@ -10,7 +10,7 @@ Write or update manifest.txt for b4xlib distribution
    ```
 2. This tool expects at least 2 arguments
 3. First argument is source folder contains the manifest.txt
-4. Second argument is the destinaton folder where the updated manifest.txt is saved (usually release folder)
+4. Second argument is the destination folder where the updated manifest.txt is saved (in my practice I use a release folder)
 5. Adding 2 more arguments to update the entry
    e.g Version 2.00
    So the Macro tag will call a command like:
