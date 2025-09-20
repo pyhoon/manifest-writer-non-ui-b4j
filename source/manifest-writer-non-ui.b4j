@@ -10,7 +10,8 @@ Version=10.3
 'Non-UI application (console / server application)
 #Region Project Attributes
 #If Debug
-#CommandLineArgs: %PROJECT%\Objects %PROJECT%\..\release Version 5.40
+#CommandLineArgs: C:\B4X\Development\manifest-writer-non-ui-b4j\source\Objects C:\B4X\Development\manifest-writer-non-ui-b4j\release Version 5.40
+'#CommandLineArgs: %PROJECT%\Objects %PROJECT%\..\release Version 5.40
 '#CommandLineArgs: %PROJECT%\Objects %PROJECT%\..\release Author Aeric Version 5.40 B4J.DependsOn JavaObject,%20jServer,%20Json,%20jStringUtils,%20Xml2Map Supported%20Platforms B4J
 #Else
 #CommandLineArgs:
@@ -30,21 +31,10 @@ Sub AppStart (Args() As String)
 	'Log("manifest writer started...")
 	For i = 0 To Args.Length - 1
 		Args(i) = Args(i).Replace("%20", " ")
-		'Log($"${i+1}: ${Args(i)}"$)
+		Log($"${i+1}: ${Args(i)}"$)
 	Next
-	Dim lines As List
 	Dim items As Map
-	Dim Source As String
-	Dim Destination As String
-	lines = File.ReadList(Source, "manifest.txt")
 	items.Initialize
-	For Each line As String In lines
-		Dim entry() As Object = Regex.Split("=", line)
-		items.Put(entry(0), entry(1))
-	Next
-	'For Each Key As String In items.Keys
-	'	Log($"${Key}=${items.Get(Key)}"$)
-	'Next
 	Select Args.Length
 		Case 2
 			Log("No changes")
@@ -67,6 +57,17 @@ Sub AppStart (Args() As String)
 			'Log("manifest writer ended")
 			ExitApplication
 	End Select
+	Dim Source As String = Args(0)
+	Dim Destination As String = Args(1)
+	Dim lines As List
+	lines = File.ReadList(Source, "manifest.txt")
+	For Each line As String In lines
+		Dim entry() As Object = Regex.Split("=", line)
+		items.Put(entry(0), entry(1))
+	Next
+	'For Each Key As String In items.Keys
+	'	Log($"${Key}=${items.Get(Key)}"$)
+	'Next
 	'File.WriteMap(File.DirApp, "manifest1.txt", items)
 	'File.WriteList(File.DirApp, "manifest2.txt", lines)
 	Dim SB As StringBuilder
@@ -76,6 +77,6 @@ Sub AppStart (Args() As String)
 	Next
 	'File.WriteString(File.DirApp, "manifest3.txt", SB.ToString.Trim)
 	File.WriteString(Destination, "manifest.txt", SB.ToString.Trim)
-	'Log("manifest writer ended")
+	Log("manifest writer ended")
 	'StartMessageLoop
 End Sub
