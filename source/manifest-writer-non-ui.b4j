@@ -10,7 +10,7 @@ Version=10.3
 'Non-UI application (console / server application)
 #Region Project Attributes
 #If Debug
-#CommandLineArgs: C:\B4X\Development\manifest-writer-non-ui-b4j\source C:\B4X\Development\manifest-writer-non-ui-b4j\release Version 5.40
+#CommandLineArgs: C:\B4X\Development\manifest-writer-non-ui-b4j\release C:\B4X\Development\manifest-writer-non-ui-b4j\release Version 5.40
 '#CommandLineArgs: %PROJECT%\Objects %PROJECT%\..\release
 '#CommandLineArgs: %PROJECT%\Objects %PROJECT%\..\release Author Aeric Version 5.40 B4J.DependsOn JavaObject,%20jServer,%20Json,%20jStringUtils,%20Xml2Map Supported%20Platforms B4J
 #Else
@@ -18,7 +18,7 @@ Version=10.3
 #End If
 #MergeLibraries: True
 #Macro: Title, Copy, ide://run?file=%WINDIR%\System32\cmd.exe&Args=/c&Args=copy&Args=%PROJECT%\MyClass.bas&Args=%PROJECT%\..\release\MyClass.bas
-#Macro: Title, Version, ide://run?file=%JAVABIN%\java.exe&Args=-jar&Args=%ADDITIONAL%\..\B4X\manifest-writer-non-ui.jar&Args=%PROJECT%&Args=%PROJECT%\..\release&Args=Version&Args=5.40
+#Macro: Title, Version, ide://run?file=%JAVABIN%\java.exe&Args=-jar&Args=%ADDITIONAL%\..\B4X\manifest-writer-non-ui.jar&Args=%PROJECT%\..\release&Args=%PROJECT%\..\release&Args=Version&Args=5.40
 #Macro: Title, Release, ide://run?file=%WINDIR%\SysWOW64\explorer.exe&Args=%PROJECT%\..\release
 #Macro: Title, Publish, ide://run?file=%JAVABIN%\jar.exe&WorkingDirectory=..\..\release&Args=-cMf&Args=%ADDITIONAL%\%PROJECT_NAME%.b4xlib&Args=*
 #If Release
@@ -32,10 +32,10 @@ End Sub
 
 Sub AppStart (Args() As String)
 	Log("manifest writer started...")
-	'For i = 0 To Args.Length - 1
-	'	Args(i) = Args(i).Replace("%20", " ")
-	'	Log($"${i+1}: ${Args(i)}"$)
-	'Next
+	For i = 0 To Args.Length - 1
+		Args(i) = Args(i).Replace("%20", " ")
+		Log($"${i+1}: ${Args(i)}"$)
+	Next
 	If Args.Length < 2 Then
 		Log("No source and destination")
 		Log("manifest writer ended")
