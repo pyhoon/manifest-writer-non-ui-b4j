@@ -1,0 +1,77 @@
+﻿AppType=StandardJava
+Build1=Default,com.puterise.manifest.writer.nonui
+Group=Default Group
+Library1=jcore
+NumberOfFiles=0
+NumberOfLibraries=1
+NumberOfModules=0
+Version=10.3
+@EndOfDesignText@
+'Non-UI application (console / server application)
+#Region Project Attributes 
+#If Debug
+#CommandLineArgs: Version 5.40
+'#CommandLineArgs: Author Aeric Version 5.40 B4J.DependsOn JavaObject,%20jServer,%20Json,%20jStringUtils,%20Xml2Map Supported%20Platforms B4J
+#Else
+#CommandLineArgs: Author Aeric Version 5.40 B4J.DependsOn JavaObject,%20jServer,%20Json,%20jStringUtils,%20Xml2Map Supported%20Platforms B4J
+#End If
+#MergeLibraries: True
+#Macro: Title, Rename, ide://run?file=%WINDIR%\System32\cmd.exe&Args=/c&Args=ren&Args=result.jar&Args=manifest-writer-non-ui.jar
+#If Release
+#CustomBuildAction: 2, C:\Windows\System32\cmd.exe, /c copy %PROJECT%\Objects\result.jar %ADDITIONAL%\..\B4X\manifest-writer-non-ui.jar
+#End If
+#End Region
+
+Sub Process_Globals
+
+End Sub
+
+Sub AppStart (Args() As String)
+	'Log("manifest writer started...")
+	For i = 0 To Args.Length - 1
+		Args(i) = Args(i).Replace("%20", " ")
+		'Log($"${i+1}: ${Args(i)}"$)
+	Next
+	Dim lines As List
+	Dim items As Map
+	lines = File.ReadList(File.DirApp, "manifest.txt")
+	items.Initialize
+	For Each line As String In lines
+		Dim entry() As Object = Regex.Split("=", line)
+		items.Put(entry(0), entry(1))
+	Next
+	'For Each Key As String In items.Keys
+	'	Log($"${Key}=${items.Get(Key)}"$)
+	'Next
+	Select Args.Length
+		Case 2
+			items.Put(Args(0), Args(1))
+		Case 4
+			items.Put(Args(0), Args(1))
+			items.Put(Args(2), Args(3))
+		Case 6
+			items.Put(Args(0), Args(1))
+			items.Put(Args(2), Args(3))
+			items.Put(Args(4), Args(5))
+		Case 8
+			items.Put(Args(0), Args(1))
+			items.Put(Args(2), Args(3))
+			items.Put(Args(4), Args(5))
+			items.Put(Args(6), Args(7))
+		Case Else
+			Log("No changes")
+			'Log("manifest writer ended")
+			ExitApplication
+	End Select
+	'File.WriteMap(File.DirApp, "manifest1.txt", items)
+	'File.WriteList(File.DirApp, "manifest2.txt", lines)
+	Dim SB As StringBuilder
+	SB.Initialize
+	For Each Key As String In items.Keys
+		SB.Append($"${Key}=${items.Get(Key)}"$).Append(CRLF)
+	Next
+	'File.WriteString(File.DirApp, "manifest.txt", SB.ToString.Trim)
+	File.WriteString(File.DirApp, "manifest3.txt", SB.ToString.Trim)
+	'Log("manifest writer ended")
+	'StartMessageLoop
+End Sub
