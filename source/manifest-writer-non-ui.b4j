@@ -10,8 +10,8 @@ Version=10.3
 'Non-UI application (console / server application)
 #Region Project Attributes
 #If Debug
-#CommandLineArgs: C:\B4X\Development\manifest-writer-non-ui-b4j\source\Objects C:\B4X\Development\manifest-writer-non-ui-b4j\release Version 5.40
-'#CommandLineArgs: %PROJECT%\Objects %PROJECT%\..\release Version 5.40
+#CommandLineArgs: C:\B4X\Development\manifest-writer-non-ui-b4j\source C:\B4X\Development\manifest-writer-non-ui-b4j\release Version 5.40
+'#CommandLineArgs: %PROJECT%\Objects %PROJECT%\..\release
 '#CommandLineArgs: %PROJECT%\Objects %PROJECT%\..\release Author Aeric Version 5.40 B4J.DependsOn JavaObject,%20jServer,%20Json,%20jStringUtils,%20Xml2Map Supported%20Platforms B4J
 #Else
 #CommandLineArgs:
@@ -28,13 +28,29 @@ Sub Process_Globals
 End Sub
 
 Sub AppStart (Args() As String)
-	'Log("manifest writer started...")
-	For i = 0 To Args.Length - 1
-		Args(i) = Args(i).Replace("%20", " ")
-		Log($"${i+1}: ${Args(i)}"$)
-	Next
+	Log("manifest writer started...")
+	'For i = 0 To Args.Length - 1
+	'	Args(i) = Args(i).Replace("%20", " ")
+	'	Log($"${i+1}: ${Args(i)}"$)
+	'Next
+	If Args.Length < 2 Then
+		Log("No source and destination")
+		Log("manifest writer ended")
+		ExitApplication
+	End If
 	Dim items As Map
 	items.Initialize
+	Dim Source As String = Args(0)
+	Dim lines As List
+	lines = File.ReadList(Source, "manifest.txt")
+	For Each line As String In lines
+		Dim entry() As Object = Regex.Split("=", line)
+		If entry.Length = 1 Then
+			items.Put(entry(0), "")
+		Else
+			items.Put(entry(0), entry(1))
+		End If
+	Next
 	Select Args.Length
 		Case 2
 			Log("No changes")
@@ -53,29 +69,22 @@ Sub AppStart (Args() As String)
 			items.Put(Args(6), Args(7))
 			items.Put(Args(8), Args(9))
 		Case Else
-			Log("No source and destination")
-			'Log("manifest writer ended")
+			Log("Invalid number or arguments")
+			Log("manifest writer ended")
 			ExitApplication
 	End Select
-	Dim Source As String = Args(0)
 	Dim Destination As String = Args(1)
-	Dim lines As List
-	lines = File.ReadList(Source, "manifest.txt")
-	For Each line As String In lines
-		Dim entry() As Object = Regex.Split("=", line)
-		items.Put(entry(0), entry(1))
-	Next
+	File.MakeDir(Destination, "")
+
 	'For Each Key As String In items.Keys
 	'	Log($"${Key}=${items.Get(Key)}"$)
 	'Next
-	'File.WriteMap(File.DirApp, "manifest1.txt", items)
-	'File.WriteList(File.DirApp, "manifest2.txt", lines)
 	Dim SB As StringBuilder
 	SB.Initialize
 	For Each Key As String In items.Keys
 		SB.Append($"${Key}=${items.Get(Key)}"$).Append(CRLF)
 	Next
-	'File.WriteString(File.DirApp, "manifest3.txt", SB.ToString.Trim)
+	'Log(SB.ToString.Trim)
 	File.WriteString(Destination, "manifest.txt", SB.ToString.Trim)
 	Log("manifest writer ended")
 	'StartMessageLoop
