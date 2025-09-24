@@ -6,7 +6,7 @@ Write or update manifest.txt for b4xlib distribution
 1. Add the #Macro tag to call *manifest-writer-non-ui.jar* from B4X additional libraries folder
    e.g
    ```B4X
-   #Macro: Title, Version, ide://run?file=%JAVABIN%\java.exe&Args=-jar&Args=%ADDITIONAL%\..\B4X\manifest-writer-non-ui.jar&Args=%PROJECT%&Args=%PROJECT%\..\release&Args=Version&Args=2.00
+   #Macro: Title, Version, ide://run?file=%JAVABIN%\java.exe&Args=-jar&Args=%ADDITIONAL%\..\B4X\manifest-writer-non-ui.jar&Args=%PROJECT%&Args=%PROJECT%\..\release&Args=Version&Args=+.1
    ```
 2. This tool expects at least 2 arguments
 3. First argument is source folder contains the manifest.txt
