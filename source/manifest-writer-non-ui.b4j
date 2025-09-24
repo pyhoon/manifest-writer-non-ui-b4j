@@ -10,19 +10,17 @@ Version=10.3
 'Non-UI application (console / server application)
 #Region Project Attributes
 #If Debug
-#CommandLineArgs: C:\B4X\Development\manifest-writer-non-ui-b4j\release C:\B4X\Development\manifest-writer-non-ui-b4j\release Version 5.40
-'#CommandLineArgs: %PROJECT%\Objects %PROJECT%\..\release
-'#CommandLineArgs: %PROJECT%\Objects %PROJECT%\..\release Author Aeric Version 5.40 B4J.DependsOn JavaObject,%20jServer,%20Json,%20jStringUtils,%20Xml2Map Supported%20Platforms B4J
+#CommandLineArgs: C:\B4X\Development\manifest-writer-non-ui-b4j\release C:\B4X\Development\manifest-writer-non-ui-b4j\release Author Aeric Version +.10
 #Else
 #CommandLineArgs:
 #End If
 #MergeLibraries: True
-#Macro: Title, Copy, ide://run?file=%WINDIR%\System32\cmd.exe&Args=/c&Args=copy&Args=%PROJECT%\MyClass.bas&Args=%PROJECT%\..\release\MyClass.bas
-#Macro: Title, Version, ide://run?file=%JAVABIN%\java.exe&Args=-jar&Args=%ADDITIONAL%\..\B4X\manifest-writer-non-ui.jar&Args=%PROJECT%\..\release&Args=%PROJECT%\..\release&Args=Version&Args=5.40
+#Macro: Title, Version, ide://run?file=%JAVABIN%\java.exe&Args=-jar&Args=%ADDITIONAL%\..\B4X\manifest-writer-non-ui.jar&Args=%PROJECT%\..\release&Args=%PROJECT%\..\release&Args=Version&Args=1.10
 #Macro: Title, Release, ide://run?file=%WINDIR%\SysWOW64\explorer.exe&Args=%PROJECT%\..\release
-#Macro: Title, Publish, ide://run?file=%JAVABIN%\jar.exe&WorkingDirectory=..\..\release&Args=-cMf&Args=%ADDITIONAL%\%PROJECT_NAME%.b4xlib&Args=*
+'#Macro: Title, Copy (B4Xlib), ide://run?file=%COMSPEC%&Args=/c&Args=copy&Args=%PROJECT%\MyClass.bas&Args=%PROJECT%\..\release\MyClass.bas
+'#Macro: Title, Publish (B4Xlib), ide://run?file=%JAVABIN%\jar.exe&WorkingDirectory=..\..\release&Args=-cMf&Args=%ADDITIONAL%\%PROJECT_NAME%.b4xlib&Args=*
 #If Release
-#CustomBuildAction: 2, C:\Windows\System32\cmd.exe, /c copy %PROJECT%\Objects\result.jar %ADDITIONAL%\..\B4X\manifest-writer-non-ui.jar
+#CustomBuildAction: 2, %COMSPEC%, /c copy %PROJECT%\Objects\result.jar %ADDITIONAL%\..\B4X\manifest-writer-non-ui.jar
 #End If
 #End Region
 
@@ -31,64 +29,67 @@ Sub Process_Globals
 End Sub
 
 Sub AppStart (Args() As String)
-	Log("manifest writer started...")
+	Log("Manifest writer started...")
+	Log("Reading args...")
 	For i = 0 To Args.Length - 1
 		Args(i) = Args(i).Replace("%20", " ")
 		Log($"${i+1}: ${Args(i)}"$)
 	Next
 	If Args.Length < 2 Then
 		Log("No source and destination")
-		Log("manifest writer ended")
+		Log("Manifest writer ended")
 		ExitApplication
 	End If
 	Dim items As Map
 	items.Initialize
 	Dim Source As String = Args(0)
+	' Create an empty file if not exist
+	If File.Exists(Source, "manifest.txt") = False Then File.WriteString(Source, "manifest.txt", "")
 	Dim lines As List
 	lines = File.ReadList(Source, "manifest.txt")
 	For Each line As String In lines
-		Dim entry() As Object = Regex.Split("=", line)
+		Dim entry() As String = Regex.Split("=", line)
 		If entry.Length = 1 Then
 			items.Put(entry(0), "")
-		Else
+		Else If entry.Length = 2 Then
 			items.Put(entry(0), entry(1))
 		End If
 	Next
 	Select Args.Length
 		Case 2
 			Log("No changes")
-		Case 4
-			items.Put(Args(2), Args(3))
-		Case 6
-			items.Put(Args(2), Args(3))
-			items.Put(Args(4), Args(5))
-		Case 8
-			items.Put(Args(2), Args(3))
-			items.Put(Args(4), Args(5))
-			items.Put(Args(6), Args(7))
-		Case 10
-			items.Put(Args(2), Args(3))
-			items.Put(Args(4), Args(5))
-			items.Put(Args(6), Args(7))
-			items.Put(Args(8), Args(9))
+		Case 4, 6, 8, 10
+			For i = 2 To Args.Length - 1 Step 2 ' start from 3rd parameter
+				'Log(Args(i) & " = " & Args(i+1))
+				' Auto increment version
+				If Args(i) = "Version" And Args(i+1).StartsWith("+") Then
+					Dim CurrentVersion As Float = IIf(items.Get("Version") = "", 0, items.Get("Version"))
+					Dim increment As Float = Args(i+1).SubString(1)
+					Dim NewVersion As String = NumberFormat2(CurrentVersion + increment, 1, 2, 2, False)
+					'Log(CurrentVersion)
+					'Log(NewVersion)
+					items.Put(Args(i), NewVersion)
+				Else
+					items.Put(Args(i), Args(i+ 1))
+				End If
+			Next
 		Case Else
 			Log("Invalid number or arguments")
-			Log("manifest writer ended")
+			Log("Manifest writer ended")
 			ExitApplication
 	End Select
 	Dim Destination As String = Args(1)
 	File.MakeDir(Destination, "")
-
-	'For Each Key As String In items.Keys
-	'	Log($"${Key}=${items.Get(Key)}"$)
-	'Next
+	Log("Updated entries:")
+	For Each Key As String In items.Keys
+		Log($"${Key}=${items.Get(Key)}"$)
+	Next
 	Dim SB As StringBuilder
 	SB.Initialize
 	For Each Key As String In items.Keys
 		SB.Append($"${Key}=${items.Get(Key)}"$).Append(CRLF)
 	Next
-	'Log(SB.ToString.Trim)
 	File.WriteString(Destination, "manifest.txt", SB.ToString.Trim)
-	Log("manifest writer ended")
-	'StartMessageLoop
+	Log("Manifest writer ended")
+	ExitApplication
 End Sub
