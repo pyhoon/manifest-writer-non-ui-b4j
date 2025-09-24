@@ -10,12 +10,12 @@ Version=10.3
 'Non-UI application (console / server application)
 #Region Project Attributes
 #If Debug
-#CommandLineArgs: C:\B4X\Development\manifest-writer-non-ui-b4j\release C:\B4X\Development\manifest-writer-non-ui-b4j\release Author Aeric Version +.10
+#CommandLineArgs: C:\B4X\Development\manifest-writer-non-ui-b4j\release C:\B4X\Development\manifest-writer-non-ui-b4j\release Author Aeric Version add.1
 #Else
 #CommandLineArgs:
 #End If
 #MergeLibraries: True
-#Macro: Title, Version, ide://run?file=%JAVABIN%\java.exe&Args=-jar&Args=%ADDITIONAL%\..\B4X\manifest-writer-non-ui.jar&Args=%PROJECT%\..\release&Args=%PROJECT%\..\release&Args=Version&Args=1.10
+#Macro: Title, Version, ide://run?file=%JAVABIN%\java.exe&Args=-jar&Args=%ADDITIONAL%\..\B4X\manifest-writer-non-ui.jar&Args=%PROJECT%\..\release&Args=%PROJECT%\..\release&Args=Version&Args=add.1
 #Macro: Title, Release, ide://run?file=%WINDIR%\SysWOW64\explorer.exe&Args=%PROJECT%\..\release
 '#Macro: Title, Copy (B4Xlib), ide://run?file=%COMSPEC%&Args=/c&Args=copy&Args=%PROJECT%\MyClass.bas&Args=%PROJECT%\..\release\MyClass.bas
 '#Macro: Title, Publish (B4Xlib), ide://run?file=%JAVABIN%\jar.exe&WorkingDirectory=..\..\release&Args=-cMf&Args=%ADDITIONAL%\%PROJECT_NAME%.b4xlib&Args=*
@@ -29,7 +29,7 @@ Sub Process_Globals
 End Sub
 
 Sub AppStart (Args() As String)
-	Log("Manifest writer started...")
+	Log("Manifest writer v2.00 started...")
 	Log("Reading args...")
 	For i = 0 To Args.Length - 1
 		Args(i) = Args(i).Replace("%20", " ")
@@ -44,7 +44,10 @@ Sub AppStart (Args() As String)
 	items.Initialize
 	Dim Source As String = Args(0)
 	' Create an empty file if not exist
-	If File.Exists(Source, "manifest.txt") = False Then File.WriteString(Source, "manifest.txt", "")
+	If File.Exists(Source, "manifest.txt") = False Then
+		File.MakeDir(Source, "")
+		File.WriteString(Source, "manifest.txt", "")
+	End If
 	Dim lines As List
 	lines = File.ReadList(Source, "manifest.txt")
 	For Each line As String In lines
@@ -62,9 +65,10 @@ Sub AppStart (Args() As String)
 			For i = 2 To Args.Length - 1 Step 2 ' start from 3rd parameter
 				'Log(Args(i) & " = " & Args(i+1))
 				' Auto increment version
-				If Args(i) = "Version" And Args(i+1).StartsWith("+") Then
-					Dim CurrentVersion As Float = IIf(items.Get("Version") = "", 0, items.Get("Version"))
-					Dim increment As Float = Args(i+1).SubString(1)
+				If Args(i) = "Version" And Args(i+1).StartsWith("add") Then
+					Dim CurrentVersion As Float = IIf(items.GetDefault("Version", "") = "", 0, items.Get("Version"))
+					'Log(Args(i+1).SubString(3))
+					Dim increment As Float = Args(i+1).SubString(3)
 					Dim NewVersion As String = NumberFormat2(CurrentVersion + increment, 1, 2, 2, False)
 					'Log(CurrentVersion)
 					'Log(NewVersion)
